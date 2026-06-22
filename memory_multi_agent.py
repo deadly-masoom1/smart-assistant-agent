@@ -101,3 +101,26 @@ print(supervisor("What is my name?" , thread_id))
 print("\n\n")
 
 
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+# Yeh FastAPI app ka instance hai
+app = FastAPI()
+
+# Request ka format
+class ChatRequest(BaseModel):
+    message: str
+
+# Chat endpoint
+@app.post("/chat")
+def chat(request: ChatRequest):
+    # Agar aap ke paas thread_id hai toh use karo, warna dummy ID
+    import uuid
+    thread_id = str(uuid.uuid4())
+    answer = supervisor(request.message, thread_id)
+    return {"answer": answer}
+
+# Health check endpoint (Railway ko signal deta hai ke app alive hai)
+@app.get("/")
+def root():
+    return {"status": "alive", "message": "Smart Assistant Agent is running!"}
